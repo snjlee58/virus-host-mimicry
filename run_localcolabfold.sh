@@ -14,8 +14,8 @@ conda activate colabfold
 # Optional: redirect weight cache off /home if quota is tight
 export XDG_CACHE_HOME=/fast/sunny
 
-INPUT="/fast/sunny/virus-host-mimicry/virprot1.fasta"
-OUTPUT="/fast/sunny/virus-host-mimicry/virprot1_output"
+INPUT="virprot1.fasta"
+OUTPUT="virprot1_output"
 
 colabfold_batch \
  
