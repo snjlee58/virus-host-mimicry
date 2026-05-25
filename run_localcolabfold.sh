@@ -18,7 +18,6 @@ INPUT="virprot1.fasta"
 OUTPUT="virprot1_output"
 
 colabfold_batch \
- 
   --num-recycle 3 \
   --amber \
   --templates \
