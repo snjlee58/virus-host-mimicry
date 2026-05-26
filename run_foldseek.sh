@@ -21,7 +21,7 @@ set -euo pipefail
 # --- Args ---
 QUERY_PDB="${1:?Usage: sbatch run_foldseek.sh <query.pdb> <output_dir>}"
 OUTPUT="${2:?Usage: sbatch run_foldseek.sh <query.pdb> <output_dir>}"
-TARGET_DB="${TARGET_DB:-/fast/sunny/foldseek_dbs/pdb}"
+TARGET_DB="${TARGET_DB:-/fast/databases/foldseek/pdb}"
 
 # --- Sanity checks (fail early with clear messages) ---
 if [[ ! -f "$QUERY_PDB" ]]; then
