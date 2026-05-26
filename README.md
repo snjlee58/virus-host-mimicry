@@ -22,3 +22,22 @@ Reference databases are kept on `/fast` and gitignored. To set up:
   curl -O https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz
   mkdir -p /fast/sunny/virus-host-mimicry/taxdump
   tar -xzf taxdump.tar.gz -C /fast/sunny/virus-host-mimicry/taxdump/
+  ```
+
+### Virus-Host DB
+Virus → host taxid mapping (Mihara et al. 2016). Used to assign each virus
+to its host's taxonomic division.
+
+- Source: https://www.genome.jp/ftp/db/virushostdb/virushostdb.tsv
+- Location on cluster: `/fast/sunny/virus-host-mimicry/virushostdb/`
+- Version pinned: snapshot dated **2026-02-14** (MD5: `66a10783690148dce327d4b90b4338f3`)
+- Download / refresh:
+  ```bash
+  mkdir -p /fast/sunny/virus-host-mimicry/virushostdb
+  cd /fast/sunny/virus-host-mimicry/virushostdb
+  curl -O https://www.genome.jp/ftp/db/virushostdb/virushostdb.tsv
+  curl -O https://www.genome.jp/ftp/db/virushostdb/README
+  ```
+- Verify: `md5sum virushostdb.tsv` (linux) or `md5 virushostdb.tsv` (macOS).
+- Note: the source FTP does not publish per-file MD5s; the hash above is
+  computed locally from the downloaded snapshot.
