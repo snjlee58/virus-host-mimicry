@@ -86,7 +86,7 @@ srun foldseek easy-search \
   "$OUTPUT/hits.m8" \
   "$SCRATCH" \
   "${EXTRA_ARGS[@]}" \
-  --format-output "query,target,evalue,prob,taxid,taxname,taxlineage" \
+  --format-output "query,target,evalue,bits,taxid,taxname,taxlineage" \
   --threads "${SLURM_CPUS_PER_TASK}"
 
 # echo "Done. Top hits:"
