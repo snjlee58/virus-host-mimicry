@@ -25,19 +25,29 @@ Reference databases are kept on `/fast` and gitignored. To set up:
   ```
 
 ### Virus-Host DB
-Virus → host taxid mapping (Mihara et al. 2016). Used to assign each virus
-to its host's taxonomic division.
+Virus → host taxid mapping and viral protein sequences (Mihara et al. 2016).
+Used to assign each virus to its host's taxonomic division and to supply
+input sequences for structure prediction.
 
-- Source: https://www.genome.jp/ftp/db/virushostdb/virushostdb.tsv
+- Source: https://www.genome.jp/ftp/db/virushostdb/
 - Location on cluster: `/fast/sunny/virus-host-mimicry/virushostdb/`
-- Version pinned: snapshot dated **2026-02-14** (MD5: `66a10783690148dce327d4b90b4338f3`)
-- Download / refresh:
-  ```bash
-  mkdir -p /fast/sunny/virus-host-mimicry/virushostdb
-  cd /fast/sunny/virus-host-mimicry/virushostdb
-  curl -O https://www.genome.jp/ftp/db/virushostdb/virushostdb.tsv
-  curl -O https://www.genome.jp/ftp/db/virushostdb/README
-  ```
-- Verify: `md5sum virushostdb.tsv` (linux) or `md5 virushostdb.tsv` (macOS).
-- Note: the source FTP does not publish per-file MD5s; the hash above is
-  computed locally from the downloaded snapshot.
+
+#### Files
+
+| File | Snapshot | MD5 | Used for |
+|---|---|---|---|
+| `virushostdb.tsv` | 2026-02-14 | `66a10783690148dce327d4b90b4338f3` | virus→host mapping (classify_viruses.py) |
+| `virushostdb.formatted.cds.faa.gz` | 2026-02-11 | `1e6d6d80194ae31e0bf58642ee0fd2c9` | viral protein FASTA (structure prediction input) |
+
+#### Download / refresh
+```bash
+mkdir -p /fast/sunny/virus-host-mimicry/virushostdb
+cd /fast/sunny/virus-host-mimicry/virushostdb
+curl -O https://www.genome.jp/ftp/db/virushostdb/virushostdb.tsv
+curl -O https://www.genome.jp/ftp/db/virushostdb/virushostdb.formatted.cds.faa.gz
+curl -O https://www.genome.jp/ftp/db/virushostdb/README
+```
+Verify: `md5sum <file>` (linux) or `md5 <file>` (macOS).
+
+Note: the source FTP does not publish per-file MD5s; the hashes above are
+computed locally from the downloaded snapshot.

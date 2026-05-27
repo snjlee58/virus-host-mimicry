@@ -6,7 +6,7 @@ taxdump/
 taxdump.tar.gz
 *.dmp
 
-virushostdb.tsv
+virushostdb/
 
 # Pipeline outputs
 *_output/
