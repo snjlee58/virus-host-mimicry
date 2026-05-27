@@ -60,10 +60,15 @@ fi
 
 mkdir -p "$OUTPUT"
 
-# Conditionally pass --prostt5-model only for sequence input.
+# Flags that only apply when the query is a FASTA going through ProstT5.
+# - --alignment-type 0: 3Di+AA scoring only. ProstT5-built DBs have no Cα, so
+#   the foldseek default (TMalign-based, needs Cα) fails at convertalis.
+# - --gpu 1: enables GPU-accelerated ProstT5 inference (~100-1000x vs CPU).
 EXTRA_ARGS=()
 if [[ "$USE_PROSTT5" == "1" ]]; then
   EXTRA_ARGS+=(--prostt5-model "$PROSTT5_WEIGHTS")
+  EXTRA_ARGS+=(--alignment-type 0)
+  EXTRA_ARGS+=(--gpu 1)
 fi
 
 # echo "Query:      $QUERY  (prostt5=$USE_PROSTT5)"
