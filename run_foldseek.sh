@@ -68,7 +68,7 @@ EXTRA_ARGS=()
 if [[ "$USE_PROSTT5" == "1" ]]; then
   EXTRA_ARGS+=(--prostt5-model "$PROSTT5_WEIGHTS")
   EXTRA_ARGS+=(--alignment-type 0)
-  EXTRA_ARGS+=(--gpu 1)
+  # EXTRA_ARGS+=(--gpu 1)   # re-enable once GPU access is sorted out
 fi
 
 # echo "Query:      $QUERY  (prostt5=$USE_PROSTT5)"
