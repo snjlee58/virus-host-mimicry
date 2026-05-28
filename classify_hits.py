@@ -85,8 +85,8 @@ def main():
     )
     ap.add_argument("hits", type=Path, help="Path to foldseek hits.m8")
     ap.add_argument(
-        "--taxdump", type=Path, default=Path("taxdump"),
-        help="Directory containing nodes.dmp and merged.dmp (default: taxdump/)",
+        "--taxdump", type=Path, default=Path("/fast/sunny/virus-host-mimicry/taxdump"),
+        help="Directory containing nodes.dmp and merged.dmp (default: /fast/sunny/virus-host-mimicry/taxdump)",
     )
     ap.add_argument(
         "-o", "--output", type=Path, default=None,
