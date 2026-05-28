@@ -76,10 +76,7 @@ fi
 # echo "Output dir: $OUTPUT"
 # echo "Threads:    ${SLURM_CPUS_PER_TASK}"
 
-# --- Run ---
-# Use $SCRATCH (node-local NVMe at /mnt/scratch/$USER/$JOB_ID) for foldseek's
-# tmp dir — MMseqs2-style intermediate I/O on /fast saturates the network FS.
-# $SCRATCH is auto-created by SLURM and auto-deleted at job end.
+# --- Run Foldseek ---
 srun foldseek easy-search \
   "$QUERY" \
   "$TARGET_DB" \
