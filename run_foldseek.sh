@@ -2,6 +2,7 @@
 #SBATCH --job-name=foldseek
 #SBATCH --partition=gpu                 # GPU partition (needed for ProstT5 inference)
 #SBATCH --gres=gpu:1                    # Request 1 GPU; PDB-only runs leave it idle
+#SBATCH --nodelist=devlss001            # devbox001 has a broken NVML driver, pin to devlss001
 #SBATCH --cpus-per-task=16              # Foldseek search step still uses CPU threads
 #SBATCH --mem=32G                       # Bump higher (e.g. 64G) if searching AFDB
 #SBATCH --time=04:00:00
