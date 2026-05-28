@@ -1,6 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=foldseek
 #SBATCH --partition=gpu                 # GPU partition (needed for ProstT5 inference)
+#SBATCH --nodelist=devlss001            # devbox001's nvidia driver is broken; pin to devlss001
 #SBATCH --gres=gpu:1                    # Request 1 GPU; PDB-only runs leave it idle
 #SBATCH --cpus-per-task=16              # Foldseek search step still uses CPU threads
 #SBATCH --mem=32G                       # Bump higher (e.g. 64G) if searching AFDB
@@ -28,7 +29,7 @@ set -euo pipefail
 # --- Args ---
 QUERY="${1:?Usage: sbatch run_foldseek.sh <query> <output_dir>}"
 OUTPUT="${2:?Usage: sbatch run_foldseek.sh <query> <output_dir>}"
-TARGET_DB="${TARGET_DB:-/fast/databases/foldseek/pdb/pdb100}"
+TARGET_DB="${TARGET_DB:-/fast/databases/foldseek/pdb/pdb100_pad}"
 PROSTT5_WEIGHTS="${PROSTT5_WEIGHTS:-/fast/sunny/virus-host-mimicry/prostt5}"
 
 # --- Detect input type by extension ---
@@ -68,7 +69,8 @@ EXTRA_ARGS=()
 if [[ "$USE_PROSTT5" == "1" ]]; then
   EXTRA_ARGS+=(--prostt5-model "$PROSTT5_WEIGHTS")
   EXTRA_ARGS+=(--alignment-type 0)
-  # EXTRA_ARGS+=(--gpu 1)   # re-enable once GPU access is sorted out
+  EXTRA_ARGS+=(--gpu 1)
+  EXTRA_ARGS+=(--prefilter-mode 1)
 fi
 
 # echo "Query:      $QUERY  (prostt5=$USE_PROSTT5)"
