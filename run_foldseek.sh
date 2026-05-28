@@ -28,7 +28,7 @@ set -euo pipefail
 # --- Args ---
 QUERY="${1:?Usage: sbatch run_foldseek.sh <query> <output_dir>}"
 OUTPUT="${2:?Usage: sbatch run_foldseek.sh <query> <output_dir>}"
-TARGET_DB="${TARGET_DB:-/fast/databases/foldseek/pdb/pdb100}"
+TARGET_DB="${TARGET_DB:-/fast/databases/foldseek/pdb/pdb2025/pdb}"
 PROSTT5_WEIGHTS="${PROSTT5_WEIGHTS:-/fast/sunny/virus-host-mimicry/prostt5}"
 
 # --- Detect input type by extension ---
