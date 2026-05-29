@@ -136,8 +136,8 @@ def hypergeom_pvals(k_counts, n, K_by_sp, N):
     return pvals
 
 
-def plot(pvals, k_counts, n, title, output_path):
-    """Stack of cells colored by -log10(p), mimicking Figure 1B."""
+def plot(pvals, title, output_path):
+    """Stack of cells colored by p-value, mimicking Lasso et al. Figure 1B."""
     labels = [l for l, _, _ in SPECIES]
     ps = [pvals[l] for l in labels]
     logp = np.array([-np.log10(max(p, 1e-20)) for p in ps])
@@ -146,43 +146,39 @@ def plot(pvals, k_counts, n, title, output_path):
     cmap = mcolors.LinearSegmentedColormap.from_list(
         "lasso", ["#2a5cad", "#e8e8e8", "#a01818"], N=256
     )
-    # Center the colormap at p = 0.05 (-log10 ≈ 1.3), saturate at p = 1e-20
+    # Color scale runs over -log10(p): 0 (p=1) -> 20 (p=1e-20).
+    # Center at p=0.05 so cells flip from blue to red across the significance boundary.
     norm = mcolors.TwoSlopeNorm(vmin=0.0, vcenter=-np.log10(0.05), vmax=20.0)
 
-    fig, ax = plt.subplots(figsize=(3.2, 4.2))
+    fig, ax = plt.subplots(figsize=(2.8, 4.2))
     cell_w, cell_h, gap = 0.9, 0.9, 0.08
 
-    for i, (label, p, lp) in enumerate(zip(labels, ps, logp)):
+    for i, (label, lp) in enumerate(zip(labels, logp)):
         y = (len(labels) - 1 - i) * (cell_h + gap)
         color = cmap(norm(lp))
         ax.add_patch(plt.Rectangle((0.6, y), cell_w, cell_h,
                                     facecolor=color, edgecolor="black", linewidth=0.8))
-        # Species label on the left
+        # Species label to the left of the cell (no annotations inside, paper style)
         ax.text(0.5, y + cell_h / 2, label, va="center", ha="right",
                 fontsize=11, fontstyle="italic")
-        # p-value annotation inside the cell
-        txt_color = "white" if lp > 5 else "black"
-        ax.text(0.6 + cell_w / 2, y + cell_h / 2,
-                f"p={p:.1e}\nk={k_counts[label]}/n={n}",
-                va="center", ha="center", fontsize=7.5, color=txt_color)
 
-    ax.set_xlim(-0.5, 2.0)
+    ax.set_xlim(-0.5, 1.8)
     ax.set_ylim(-0.3, len(labels) * (cell_h + gap))
     ax.set_aspect("equal")
     ax.axis("off")
     ax.set_title(title, fontsize=12, pad=12)
 
-    # Colorbar at the bottom (mirrors the paper's pval legend)
+    # Colorbar labeled with p-values (not -log10), matching the paper's "pval:" legend
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     sm.set_array([])
     cbar = fig.colorbar(sm, ax=ax, orientation="horizontal", pad=0.08,
-                        shrink=0.7, aspect=18)
-    cbar.set_label("$-\\log_{10}(p)$", fontsize=9)
+                        shrink=0.85, aspect=20)
+    cbar.set_label("pval", fontsize=10)
     cbar.ax.tick_params(labelsize=8)
-    # Add a tick at 0.05 to mark the conventional significance threshold
-    ticks = [0, -np.log10(0.05), 5, 10, 15, 20]
-    cbar.set_ticks(ticks)
-    cbar.set_ticklabels([f"{t:.1f}" for t in ticks])
+    # Show three reference p-values: 1 (no signal), 0.05 (conventional threshold), 1e-20 (saturated)
+    tick_pvals = [1.0, 0.05, 1e-20]
+    cbar.set_ticks([-np.log10(p) for p in tick_pvals])
+    cbar.set_ticklabels(["1", "0.05", r"$1\times10^{-20}$"])
 
     plt.tight_layout()
     plt.savefig(output_path, dpi=150, bbox_inches="tight")
@@ -214,7 +210,7 @@ def main():
         print(f"{label:<16} {k_counts[label]:>7,} {K:>9,} {n:>9,} {N:>10,}  "
               f"{pvals[label]:.3e}", file=sys.stderr)
 
-    plot(pvals, k_counts, n, args.title, args.output)
+    plot(pvals, args.title, args.output)
     print(f"\nSaved {args.output}", file=sys.stderr)
 
 
