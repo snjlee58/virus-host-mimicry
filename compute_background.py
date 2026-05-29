@@ -122,7 +122,8 @@ def main():
 
     with open(mapping_path) as f:
         for line in f:
-            parts = line.rstrip("\n").split("\t")
+            # _mapping is whitespace-separated (space, not tab) in current foldseek
+            parts = line.split()
             if len(parts) < 2:
                 continue
             N += 1
