@@ -7,6 +7,9 @@ bacteria, plantfungi, invertebrate, vertebrate, human, virus, phage, unknown.
 Classification uses NCBI taxonomic divisions from nodes.dmp (the paper's
 method), with merged.dmp applied to rescue stale strain taxids.
 
+Output: the input hits.m8 verbatim with a single new tab-separated column
+appended to each row — the bucket label. Row count is unchanged.
+
 Example:
     python3 classify_hits.py virprot1_output/foldseek/hits.m8
         -> writes virprot1_output/foldseek/hits.classified.tsv

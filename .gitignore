@@ -1,6 +1,12 @@
 # macOS
 .DS_Store
 
+# Python
+__pycache__/
+*.pyc
+.venv/
+.env
+
 # Reference databases — keep on /fast, not in git
 taxdump/
 taxdump.tar.gz
@@ -15,8 +21,5 @@ tmp/
 *.m8
 *.classified.tsv
 
-# Python
-__pycache__/
-*.pyc
-.venv/
-.env
+# Lasso 2021 paper repository
+VirusHost_mimicry_Science2021/
