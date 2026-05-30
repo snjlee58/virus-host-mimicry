@@ -179,6 +179,8 @@ def plot(pvals, title, output_path):
     tick_pvals = [1.0, 0.05, 1e-20]
     cbar.set_ticks([-np.log10(p) for p in tick_pvals])
     cbar.set_ticklabels(["1", "0.05", r"$1\times10^{-20}$"])
+    # Match the paper's Figure 1B orientation: 1e-20 (red) on the left, 1 (blue) on the right
+    cbar.ax.invert_xaxis()
 
     plt.tight_layout()
     plt.savefig(output_path, dpi=150, bbox_inches="tight")
