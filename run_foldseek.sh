@@ -1,10 +1,10 @@
 #!/bin/bash
 #SBATCH --job-name=foldseek
 #SBATCH --partition=gpu                 # GPU partition (needed for ProstT5 inference)
-#SBATCH --gres=gpu:1                    # Request 1 GPU; PDB-only runs leave it idle
+#SBATCH --gres=gpu:6                    # All 6 L40S on devlss001; foldseek spreads the target DB across them
 #SBATCH --nodelist=devlss001            # devbox001 has a broken NVML driver, pin to devlss001
-#SBATCH --cpus-per-task=16              # Foldseek search step still uses CPU threads
-#SBATCH --mem=32G                       # Bump higher (e.g. 64G) if searching AFDB
+#SBATCH --cpus-per-task=64              # All 64 cores on devlss001; helps the post-prefilter alignment stage
+#SBATCH --mem=128G                      # Plenty of headroom; bump to 256G for AFDB-scale searches
 #SBATCH --time=04:00:00
 #SBATCH --output=logs/foldseek_%j.log
 
@@ -29,7 +29,7 @@ set -euo pipefail
 # --- Args ---
 QUERY="${1:?Usage: sbatch run_foldseek.sh <query> <output_dir>}"
 OUTPUT="${2:?Usage: sbatch run_foldseek.sh <query> <output_dir>}"
-TARGET_DB="${TARGET_DB:-/fast/databases/foldseek/pdb/pdb2025/pdb}"
+TARGET_DB="${TARGET_DB:-/fast2/yewon1/AFCDB_analysis_data/foldseek_search_PDBe/foldseek_pdb_db/gpu_pdb}"
 PROSTT5_WEIGHTS="${PROSTT5_WEIGHTS:-/fast/sunny/virus-host-mimicry/prostt5}"
 
 # --- Detect input type by extension ---
@@ -64,12 +64,15 @@ mkdir -p "$OUTPUT"
 # Flags that only apply when the query is a FASTA going through ProstT5.
 # - --alignment-type 0: 3Di+AA scoring only. ProstT5-built DBs have no Cα, so
 #   the foldseek default (TMalign-based, needs Cα) fails at convertalis.
-# - --gpu 1: enables GPU-accelerated ProstT5 inference (~100-1000x vs CPU).
+# - --gpu 1: GPU-accelerated ProstT5 inference. With SLURM allocating multiple GPUs
+#   (--gres=gpu:N), CUDA_VISIBLE_DEVICES is auto-set to those indices and foldseek
+#   splits work across them. No manual export needed.
 EXTRA_ARGS=()
 if [[ "$USE_PROSTT5" == "1" ]]; then
   EXTRA_ARGS+=(--prostt5-model "$PROSTT5_WEIGHTS")
   EXTRA_ARGS+=(--alignment-type 0)
-  EXTRA_ARGS+=(--gpu 1)   # re-enable once GPU access is sorted out
+  EXTRA_ARGS+=(--gpu 1)
+  EXTRA_ARGS+=(--prefilter-mode 1)
 fi
 
 # echo "Query:      $QUERY  (prostt5=$USE_PROSTT5)"
