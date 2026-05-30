@@ -2,9 +2,9 @@
 #SBATCH --job-name=foldseek
 #SBATCH --partition=gpu                 # GPU partition (needed for ProstT5 inference)
 #SBATCH --gres=gpu:6                    # All 6 L40S on devlss001; foldseek spreads the target DB across them
-#SBATCH --nodelist=devlss001            # devbox001 has a broken NVML driver, pin to devlss001
-#SBATCH --cpus-per-task=64              # All 64 cores on devlss001; helps the post-prefilter alignment stage
-#SBATCH --mem=128G                      # Plenty of headroom; bump to 256G for AFDB-scale searches
+#SBATCH --nodelist=devlss001,devlss002  # devbox001 has a broken NVML driver, pin to devlss001 or devlss002 for GPU-accelerated runs
+#SBATCH --cpus-per-task=32   # Half of devlss002, quarter of devlss001 — fits anywhere
+#SBATCH --mem=128G            # Safe headroom; could drop to 64G if you wanted
 #SBATCH --time=04:00:00
 #SBATCH --output=logs/foldseek_%j.log
 
