@@ -7,7 +7,7 @@ H. sapiens).
 
 Pipeline:
   1. Read hits.classified.tsv (output of classify_hits.py).
-  2. Drop rows with evalue > threshold (default: 1e-3).
+  2. Drop rows with evalue > threshold (default: 1e-10).
   3. Deduplicate to unique structural neighbors at the target (PDB chain) level.
   4. Count neighbors per species by matching the taxlineage column.
   5. Run hypergeometric P(X >= k) for each species using N, K from
@@ -21,7 +21,7 @@ was run with --format-output "query,target,evalue,bits,taxid,taxname,taxlineage"
 Example:
     python3 enrichment_fig1b.py tests/ecoli/foldseek_output/hits.classified.tsv \\
         --background background_counts.tsv \\
-        --evalue 1e-3 \\
+        --evalue 1e-10 \\
         --title "viruses of E. coli" \\
         -o figure_1B.png
 """
@@ -59,7 +59,7 @@ def parse_args():
         help="TSV from compute_background.py",
     )
     ap.add_argument(
-        "--evalue", type=float, default=1e-3,
+        "--evalue", type=float, default=1e-10,
         help="Max evalue for a hit to count as a structural neighbor",
     )
     ap.add_argument(
