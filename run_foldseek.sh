@@ -1,10 +1,10 @@
 #!/bin/bash
 #SBATCH --job-name=foldseek
 #SBATCH --partition=gpu                 # GPU partition (needed for ProstT5 inference)
-#SBATCH --gres=gpu:6                    # 6 L40S; foldseek spreads the target DB across them
+#SBATCH --gres=gpu:6                    # 6 of devbox002's 8 A5000s; foldseek spreads ProstT5 across them
 #SBATCH --nodes=1                       # Force single-node job (without this, SLURM treats --nodelist as "ALL of these")
-#SBATCH --nodelist=devlss001,devlss002  # Either node works; SLURM picks whichever has resources free first
-#SBATCH --cpus-per-task=32              # Half of devlss002, quarter of devlss001 — fits anywhere
+#SBATCH --nodelist=devlss001,devlss002,devbox002            # Healthy GPU node (devbox001 has a broken driver; devlss nodes often busy)
+#SBATCH --cpus-per-task=32              # devbox002 has 64 SLURM CPUs, so 32 fits with headroom
 #SBATCH --mem=128G                      # Safe headroom; could drop to 64G if you wanted
 #SBATCH --time=04:00:00
 #SBATCH --output=logs/foldseek_%j.log

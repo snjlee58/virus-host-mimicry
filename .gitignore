@@ -20,6 +20,7 @@ logs/
 tmp/
 *.m8
 *.classified.tsv
+classify_logs.txt
 
 # Lasso 2021 paper repository
 VirusHost_mimicry_Science2021/
