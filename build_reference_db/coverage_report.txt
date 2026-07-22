@@ -1,0 +1,14 @@
+proteomes read (non-header): 36465
+  dropped, no order rank:    4709
+  dropped, non-cellular:     9864
+orders with a representative: 781
+  Archaea    35
+  Bacteria   306
+  Eukaryota  440
+
+coverage vs tree-of-life orders (orders_tree_of_life.tsv):
+  Archaea    35/94 orders covered
+  Bacteria   306/468 orders covered
+  Eukaryota  440/1464 orders covered
+  TOTAL      781/2026 orders covered
+  orders with NO reference proteome: 1245
