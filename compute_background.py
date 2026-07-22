@@ -52,7 +52,7 @@ BUCKET_ORDER = [
     "virus", "phage", "unknown",
 ]
 
-# Foldseek target DB that searches run against (must match run_foldseek.sh's
+# Foldseek target DB that searches run against (DEDUPLICATED, LIKE PDB100)
 # TARGET_DB, or N/K won't correspond to the hits being tested).
 DEFAULT_DB = "/fast2/yewon1/AFCDB_analysis_data/foldseek_search_PDBe/foldseek_pdb_db/gpu_pdb"
 
