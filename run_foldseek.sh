@@ -4,8 +4,10 @@
 #SBATCH --cpus-per-task=64
 #SBATCH --mem=100G
 #SBATCH --time=48:00:00                 # BFVD x AFDB/Proteome TMalign is large; adjust to your partition's limit
-#SBATCH --output=logs/foldseek_%j.log
-#SBATCH -e slurm-%j.err
+# NOTE: SLURM opens these before the job starts, so this dir must already exist
+# (mkdir -p it once) and must match $OUTPUT below.
+#SBATCH --output=/fast/sunny/virus-host-mimicry/tests/host_divisions/fig1c_reproduction_bfvd/foldseek_%j.log
+#SBATCH --error=/fast/sunny/virus-host-mimicry/tests/host_divisions/fig1c_reproduction_bfvd/foldseek_%j.err
 
 # Foldseek structure-vs-structure search for the Fig 1C reproduction
 # (Lasso et al. 2021), detecting viral mimicry of host proteins.
@@ -28,7 +30,7 @@ set -euo pipefail
 # --- Args (defaults reproduce the Fig 1C test) ---
 QUERY="${1:-/fast/sunny/bfvd/2023_02_v2/bfvd}"                     # dir of viral PDB files
 TARGET_DB="${2:-/fast/databases/foldseek/afdb_v6/afdb_proteome}"  # prebuilt Foldseek DB
-OUTPUT="${3:-foldseek_bfvd_vs_afdb_proteome}"
+OUTPUT="${3:-/fast/sunny/virus-host-mimicry/tests/host_divisions/fig1c_reproduction_bfvd}"
 
 # --- Sanity checks (fail early with clear messages) ---
 if [[ ! -e "$QUERY" ]]; then
@@ -45,7 +47,7 @@ fi
 # conda activate foldseek
 # module load foldseek
 
-mkdir -p "$OUTPUT" logs
+mkdir -p "$OUTPUT"
 TMP="${SCRATCH:-$OUTPUT/tmp}"
 mkdir -p "$TMP"
 
