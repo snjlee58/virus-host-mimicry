@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=foldseek
-#SBATCH --partition=cpu
+#SBATCH --partition=compute
 #SBATCH --cpus-per-task=64
 #SBATCH --mem=100G
 #SBATCH --time=48:00:00                 # BFVD x AFDB/Proteome TMalign is large; adjust to your partition's limit
