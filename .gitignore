@@ -12,7 +12,12 @@ taxdump/
 taxdump.tar.gz
 *.dmp
 
+#VirusHostDB
 virushostdb/
+
+# Test Proteomes
+build_reference_db/toy_dataset
+build_reference_db/uniprot_reference_proteomes
 
 # Pipeline outputs
 *_output/
