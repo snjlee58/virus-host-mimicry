@@ -65,7 +65,8 @@ srun foldseek easy-search \
   "$TARGET_DB" \
   "$OUTPUT/hits.m8" \
   "$TMP" \
-  --alignment-type 1 \
+  --alignment-type 1 --tmscore-threshold 0.5 \
+  --cov-mode 2 -c 0.7 \
   --format-output "query,target,alntmscore,qtmscore,ttmscore,qcov,tcov,qlen,tlen,alnlen,fident,lddt,prob,evalue,bits,taxid,taxname,taxlineage" \
   --threads "${SLURM_CPUS_PER_TASK:-64}"
 
