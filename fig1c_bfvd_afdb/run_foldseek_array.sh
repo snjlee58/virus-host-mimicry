@@ -30,7 +30,8 @@
 set -euo pipefail
 
 OUT="${1:-/fast/sunny/virus-host-mimicry/tests/host_divisions/fig1c_bfvd_afdb}"
-TARGET_DB="${2:-/fast/databases/foldseek/afdb_v6/afdb50_seq}"   # AFDB50 cluster-search (expansion) DB
+TARGET_DB="${2:-/fast/databases/foldseek/afdb_v6/afdb50}"       # cluster-search REP DB; foldseek auto-finds <TARGET_DB>_seq (members) + _clu
+MEMBER_DB="${TARGET_DB}_seq"                                     # expanded hits are member-space -> convertalis resolves names/taxonomy here
 
 # --- Setup (uncomment whichever your cluster needs to expose `foldseek`) ---
 # source ~/miniforge3/etc/profile.d/conda.sh
@@ -42,9 +43,8 @@ TARGET_DB="${2:-/fast/databases/foldseek/afdb_v6/afdb50_seq}"   # AFDB50 cluster
 TASK=$(printf '%04d' "$SLURM_ARRAY_TASK_ID")
 LIST="$OUT/chunks/list_$TASK"
 [[ -f "$LIST" ]] || { echo "ERROR: chunk list not found: $LIST" >&2; exit 1; }
-if [[ ! -f "${TARGET_DB}" && ! -f "${TARGET_DB}.dbtype" ]]; then
-  echo "ERROR: Foldseek target DB not found: $TARGET_DB" >&2; exit 1
-fi
+[[ -f "${TARGET_DB}.dbtype" ]] || { echo "ERROR: cluster-search rep DB not found: ${TARGET_DB}.dbtype" >&2; exit 1; }
+[[ -f "${MEMBER_DB}.dbtype" ]] || { echo "ERROR: member DB not found: ${MEMBER_DB}.dbtype (needed for expansion)" >&2; exit 1; }
 
 # Per-task scratch (node-local); auto-cleaned so concurrent tasks never collide.
 TMP="${SCRATCH:-/tmp}/fs_${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}"
@@ -74,9 +74,9 @@ foldseek search "$QUERYDB" "$TARGET_DB" "$RESULT" "$TMP/searchtmp" \
   --cov-mode 2 -c 0.7 \
   --threads "${SLURM_CPUS_PER_TASK}"
 
-# 3) format the results. taxid/taxname/taxlineage require the target to carry
-#    taxonomy (afdb50_seq*_mapping / *_taxonomy) -- verify, or drop those columns.
-foldseek convertalis "$QUERYDB" "$TARGET_DB" "$RESULT" "$OUT_M8" \
+# 3) format the results against the MEMBER DB (expanded hits are member-space).
+#    afdb50 carries taxonomy (afdb50_taxonomy / _mapping), so the taxid columns fill in.
+foldseek convertalis "$QUERYDB" "$MEMBER_DB" "$RESULT" "$OUT_M8" \
   --format-output "query,target,alntmscore,qcov,tcov,evalue,taxid,taxname,taxlineage" \
   --threads "${SLURM_CPUS_PER_TASK}"
 
