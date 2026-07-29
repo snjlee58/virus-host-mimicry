@@ -3,8 +3,8 @@
 #
 # Same idea as the afdb_proteome version: list every PDB in the BFVD2 folder and
 # split that list into fixed-size chunk manifests (chunks/list_0000, ...). Chunks
-# are bigger here (50k default) because the full-AFDB target is very expensive to
-# load per task, so we amortize that load over more queries per chunk.
+# are LARGE here (250k default -> ~5 chunks) because each chunk re-scans the whole
+# 241M-entry target, so fewer/larger chunks avoid redundant full-target scans.
 #
 # Run ONCE on the login shell (just listing + splitting text). Prints K + the
 # exact sbatch command.
@@ -15,7 +15,7 @@ set -euo pipefail
 
 BFVD2="${1:-/fast/sunny/bfvd2/bfvd2_pdb_only}"
 OUT="${2:-/fast/sunny/virus-host-mimicry/tests/host_divisions/fig1c_bfvd_afdb}"
-CHUNK_SIZE="${3:-50000}"   # bigger than the proteome run to amortize the costly full-AFDB index load
+CHUNK_SIZE="${3:-250000}"  # FEW large chunks: each chunk re-scans the whole 241M target, so minimize chunk count
 
 [[ -d "$BFVD2" ]] || { echo "ERROR: BFVD2 dir not found: $BFVD2" >&2; exit 1; }
 
@@ -38,6 +38,6 @@ echo ""
 echo "PILOT ONE CHUNK FIRST (full AFDB is a different beast — measure before committing):"
 echo "  sbatch --array=0 run_foldseek_array.sh"
 echo "then, once its runtime/memory look OK:"
-echo "  sbatch --array=1-$((K - 1))%8 run_foldseek_array.sh"
+echo "  sbatch --array=1-$((K - 1))%3 run_foldseek_array.sh"
 echo ""
 echo "After all tasks finish:  bash merge_hits.sh"
