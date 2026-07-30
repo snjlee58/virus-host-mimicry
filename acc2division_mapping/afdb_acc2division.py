@@ -32,8 +32,8 @@ Quirks of this scheme, all inherent to NCBI (see README):
 
 Usage:
     python3 afdb_acc2division.py \
-        --db /path/to/afdb50_seq \
-        --taxdump /path/to/taxdump \
+        --db /fast/databases/foldseek/afdb_v6/afdb50_seq \
+        --taxdump /fast/sunny/ncbi_taxdump/taxdump \
         --out afdb_acc2division.tsv.gz \
         --summary afdb_division_counts.tsv
 
