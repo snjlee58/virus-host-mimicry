@@ -58,6 +58,7 @@ Useful env overrides:
 | `PER_PROTEOME` | `0` | 1 = also build one DB per proteome |
 | `WORKERS` | `16` | parallel gene2acc downloads |
 | `MIRROR` | `ebi` | `uniprot` to use the URLs as written |
+| `DL` | auto | downloader: `curl`, `wget` or `python3`. Auto-detected in that order; only needed when something isn't already cached, so a warm `<outdir>/gene2acc` needs none. Compute nodes here have no `curl`. |
 
 Then search it:
 

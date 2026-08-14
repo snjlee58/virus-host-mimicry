@@ -44,8 +44,19 @@ FOLDSEEK=${FOLDSEEK_BIN:-foldseek}
 
 [ -f "$MANIFEST" ] || { echo "ERROR: selection not found: $MANIFEST" >&2; exit 1; }
 command -v "$FOLDSEEK" >/dev/null || { echo "ERROR: foldseek not on PATH (set FOLDSEEK_BIN)" >&2; exit 1; }
-command -v curl >/dev/null || { echo "ERROR: curl not on PATH" >&2; exit 1; }
 [ -f "${SRC}.dbtype" ] || { echo "ERROR: not a Foldseek DB: $SRC (no ${SRC}.dbtype)" >&2; exit 1; }
+
+# Downloader is resolved at runtime, not required up front: compute nodes here have
+# no curl, and a warm gene2acc cache needs no downloader at all.
+DL=${DL:-}
+if [ -n "$DL" ]; then
+  case "$DL" in
+    curl|wget|python3) command -v "$DL" >/dev/null || { echo "ERROR: DL=$DL not on PATH" >&2; exit 1; } ;;
+    *) echo "ERROR: DL must be curl, wget or python3 (got '$DL')" >&2; exit 1 ;;
+  esac
+else
+  for c in curl wget python3; do command -v "$c" >/dev/null && { DL=$c; break; }; done
+fi
 
 GENE2ACC=$OUTDIR/gene2acc
 PROTEOMES=$OUTDIR/proteomes
@@ -95,21 +106,40 @@ echo "[1/5] proteomes in selection: $N_PROT"
 # (~1 s vs ~53 s per file measured), which over ~1900 proteomes is the difference
 # between half an hour and most of a day.
 : > "$META/failed_urls.txt"
-export GENE2ACC META
+while IFS= read -r url; do
+  [ -s "$GENE2ACC/$(basename "$url")" ] || printf '%s\n' "$url"
+done < "$META/urls.txt" > "$META/todo.txt"
+N_TODO=$(grep -c . "$META/todo.txt" || true)
+
+export GENE2ACC META DL
 fetch_one() {
   url=$1
   gz="$GENE2ACC/$(basename "$url")"
   [ -s "$gz" ] && exit 0
-  if curl -sSfL --retry 3 --retry-delay 3 --max-time 300 -o "$gz.part" "$url"; then
-    mv -f "$gz.part" "$gz"
-  else
-    rm -f "$gz.part"
-    printf '%s\n' "$url" >> "$META/failed_urls.txt"
-  fi
+  case "$DL" in
+    curl)    curl -sSfL --retry 3 --retry-delay 3 --max-time 300 -o "$gz.part" "$url" ;;
+    wget)    wget -q -T 300 -t 3 -O "$gz.part" "$url" ;;
+    python3) python3 -c 'import sys,urllib.request
+urllib.request.urlretrieve(sys.argv[1], sys.argv[2])' "$url" "$gz.part" ;;
+    *)       exit 3 ;;
+  esac && mv -f "$gz.part" "$gz" || {
+    rm -f "$gz.part"; printf '%s\n' "$url" >> "$META/failed_urls.txt"; }
 }
 export -f fetch_one
-echo "[2/5] fetching gene2acc (cached; re-runs are free)"
-xargs -P "$WORKERS" -I{} bash -c 'fetch_one "$@"' _ {} < "$META/urls.txt" || true
+
+if [ "$N_TODO" -eq 0 ]; then
+  echo "[2/5] gene2acc: all $N_PROT already cached, nothing to fetch"
+else
+  [ -n "$DL" ] || {
+    echo "ERROR: need to fetch $N_TODO gene2acc files but found no downloader" >&2
+    echo "       (looked for curl, wget, python3). Either run this on a node that has" >&2
+    echo "       one, or pre-fetch the cache on the login node with the same command" >&2
+    echo "       and re-run here -- the cache lives in $GENE2ACC" >&2
+    exit 1
+  }
+  echo "[2/5] fetching $N_TODO gene2acc via $DL ($WORKERS parallel; cached, re-runs free)"
+  xargs -P "$WORKERS" -I{} bash -c 'fetch_one "$@"' _ {} < "$META/todo.txt" || true
+fi
 N_FAIL=$(grep -c . "$META/failed_urls.txt" || true)
 N_HAVE=$(find "$GENE2ACC" -name '*.gene2acc.gz' -size +0 | wc -l | tr -d ' ')
 echo "      cached: $N_HAVE / $N_PROT   failed: $N_FAIL"
