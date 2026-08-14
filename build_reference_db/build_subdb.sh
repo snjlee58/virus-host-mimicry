@@ -282,7 +282,7 @@ fi
   echo "source DB:          $SRC"
   echo "selection:          $MANIFEST   ($N_PROT proteomes, $N_HAVE fetched)"
   echo "unique accessions:  $N_ACC"
-  echo "structures in DB:   $N_KEY"
+  echo "structures in DB:   $N_KEY" # 22,971,764 structures
   echo "no AFDB model:      $N_MISS   (-> missing.txt)"
   [ "$N_FAIL" -eq 0 ] || echo "gene2acc failures:  $N_FAIL   (-> _meta/failed_urls.txt)"
   awk -v f="$N_KEY" -v n="$N_ACC" 'BEGIN{printf "coverage:           %.2f%%\n", f*100.0/n}'
