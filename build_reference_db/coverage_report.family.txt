@@ -1,0 +1,8 @@
+rank: family
+proteomes read (non-header): 36465
+  dropped, no family rank:   2668
+  dropped, non-cellular:     11979
+familys with a representative: 1912
+  Archaea    57
+  Bacteria   759
+  Eukaryota  1096
